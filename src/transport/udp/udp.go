@@ -174,6 +174,9 @@ func handleConn(conn udpConn, port int, s *stack.Stack) {
 
 	var mostRecentPacket *stack.PacketBuffer
 
+	// SOCKS: Disable UDP
+	return
+
 	// New dialer from source to destination.
 	laddr, err := net.ResolveUDPAddr("udp", fmt.Sprintf(":%d", port))
 	if err != nil {
