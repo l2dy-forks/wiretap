@@ -192,6 +192,11 @@ func handleConn(conn udpConn, port int, s *stack.Stack) {
 		return
 	}
 
+	// Sabotage HTTP/3 connections using port 443
+	if newConn != nil && raddr.Port == 443 {
+		return
+	}
+
 	if newConn == nil {
 		// Reusing port so we can get the ICMP unreachable message back.
 		// Would like to use ListenUDP, but we don't get ICMP unreachable.
