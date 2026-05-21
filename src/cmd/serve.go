@@ -29,8 +29,6 @@ import (
 	gudp "gvisor.dev/gvisor/pkg/tcpip/transport/udp"
 
 	"wiretap/peer"
-	"wiretap/transport/api"
-	"wiretap/transport/icmp"
 	"wiretap/transport/tcp"
 	"wiretap/transport/udp"
 	"wiretap/transport/userspace"
@@ -299,7 +297,7 @@ func (c serveCmdConfig) Run() {
 
 	// Synchronization vars.
 	var (
-		wg   sync.WaitGroup
+		// wg   sync.WaitGroup
 		lock sync.Mutex
 	)
 
@@ -598,32 +596,32 @@ func (c serveCmdConfig) Run() {
 
 	// Handlers that require long-running routines:
 
-	// Start ICMP Handler.
-	wg.Add(1)
-	go func() {
-		icmp.Handle(transportHandler, &lock)
-		wg.Done()
-	}()
+	// // Start ICMP Handler.
+	// wg.Add(1)
+	// go func() {
+	// 	icmp.Handle(transportHandler, &lock)
+	// 	wg.Done()
+	// }()
 
-	// Start API handler.
-	wg.Add(1)
-	go func() {
-		ns := api.NetworkState{
-			NextClientRelayAddr4: netip.MustParseAddr(c.clientAddr4Relay),
-			NextClientRelayAddr6: netip.MustParseAddr(c.clientAddr6Relay),
-			NextServerRelayAddr4: netip.MustParseAddr(viper.GetString("Relay.Interface.ipv4")),
-			NextServerRelayAddr6: netip.MustParseAddr(viper.GetString("Relay.Interface.ipv6")),
-			NextClientE2EEAddr4:  netip.MustParseAddr(c.clientAddr4E2EE),
-			NextClientE2EEAddr6:  netip.MustParseAddr(c.clientAddr6E2EE),
-			NextServerE2EEAddr4:  netip.MustParseAddr(viper.GetString("E2EE.Interface.ipv4")),
-			NextServerE2EEAddr6:  netip.MustParseAddr(viper.GetString("E2EE.Interface.ipv6")),
-			ApiAddr:              netip.MustParseAddr(viper.GetString("E2EE.Interface.api")),
-		}
-		api.Handle(transportHandler, devRelay, devE2EE, &configRelay, &configE2EE, apiAddr, uint16(ApiPort), &lock, &ns)
-		wg.Done()
-	}()
+	// // Start API handler.
+	// wg.Add(1)
+	// go func() {
+	// 	ns := api.NetworkState{
+	// 		NextClientRelayAddr4: netip.MustParseAddr(c.clientAddr4Relay),
+	// 		NextClientRelayAddr6: netip.MustParseAddr(c.clientAddr6Relay),
+	// 		NextServerRelayAddr4: netip.MustParseAddr(viper.GetString("Relay.Interface.ipv4")),
+	// 		NextServerRelayAddr6: netip.MustParseAddr(viper.GetString("Relay.Interface.ipv6")),
+	// 		NextClientE2EEAddr4:  netip.MustParseAddr(c.clientAddr4E2EE),
+	// 		NextClientE2EEAddr6:  netip.MustParseAddr(c.clientAddr6E2EE),
+	// 		NextServerE2EEAddr4:  netip.MustParseAddr(viper.GetString("E2EE.Interface.ipv4")),
+	// 		NextServerE2EEAddr6:  netip.MustParseAddr(viper.GetString("E2EE.Interface.ipv6")),
+	// 		ApiAddr:              netip.MustParseAddr(viper.GetString("E2EE.Interface.api")),
+	// 	}
+	// 	api.Handle(transportHandler, devRelay, devE2EE, &configRelay, &configE2EE, apiAddr, uint16(ApiPort), &lock, &ns)
+	// 	wg.Done()
+	// }()
 
-	wg.Wait()
+	s.Wait()
 }
 
 // Setup iptables rule for localhost re-routing (DNAT)
